@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingkai KPU - Flexible Gradient Blend Control</title>
+    <title>Bingkai KPU - Full Custom Gradient Control</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -197,39 +197,64 @@
                 </div>
             </div>
 
-            <!-- SECTION B: KONTROL GRADASI PEMBATAS (BARU) -->
+            <!-- SECTION B: KONTROL GRADASI (PEMBATAS TENGAH & FOOTER MERAH) -->
             <div id="sectionBlendControls" class="space-y-3 hidden">
                 <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-800 space-y-3">
-                    <!-- Posisi Pusat Gradasi -->
-                    <div>
-                        <div class="flex justify-between text-[11px] font-medium text-slate-400 mb-1">
-                            <span>Posisi Pembatas (Naik / Turun)</span>
-                            <span id="blendCenterVal" class="text-red-400 font-bold">650 px</span>
+                    
+                    <!-- Sub-Grup 1: Gradasi Pembatas Tengah -->
+                    <div class="border-b border-slate-700/60 pb-3 space-y-2.5">
+                        <span class="text-[11px] font-bold text-red-400 uppercase tracking-wider block">1. Pembatas Tengah (Foto 1 & 2)</span>
+                        
+                        <div>
+                            <div class="flex justify-between text-[11px] font-medium text-slate-400 mb-1">
+                                <span>Posisi Pembatas (Naik / Turun)</span>
+                                <span id="blendCenterVal" class="text-slate-200 font-bold">650 px</span>
+                            </div>
+                            <input type="range" id="blendCenterInput" min="300" max="1000" step="5" value="650">
                         </div>
-                        <input type="range" id="blendCenterInput" min="300" max="1000" step="5" value="650">
+
+                        <div>
+                            <div class="flex justify-between text-[11px] font-medium text-slate-400 mb-1">
+                                <span>Perluas Ke Atas</span>
+                                <span id="blendUpVal" class="text-slate-200 font-bold">150 px</span>
+                            </div>
+                            <input type="range" id="blendUpInput" min="20" max="500" step="5" value="150">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-[11px] font-medium text-slate-400 mb-1">
+                                <span>Perluas Ke Bawah</span>
+                                <span id="blendDownVal" class="text-slate-200 font-bold">200 px</span>
+                            </div>
+                            <input type="range" id="blendDownInput" min="20" max="500" step="5" value="200">
+                        </div>
                     </div>
 
-                    <!-- Perluas Ke Atas -->
-                    <div>
-                        <div class="flex justify-between text-[11px] font-medium text-slate-400 mb-1">
-                            <span>Perluas Ke Atas (Jangkauan Atas)</span>
-                            <span id="blendUpVal" class="text-red-400 font-bold">150 px</span>
+                    <!-- Sub-Grup 2: Gradasi Merah Footer -->
+                    <div class="space-y-2.5 pt-1">
+                        <span class="text-[11px] font-bold text-red-400 uppercase tracking-wider block">2. Gradasi Merah Footer (Bawah)</span>
+                        
+                        <div>
+                            <div class="flex justify-between text-[11px] font-medium text-slate-400 mb-1">
+                                <span>Tinggi Area Gradasi Merah</span>
+                                <span id="footerHeightVal" class="text-slate-200 font-bold">430 px</span>
+                            </div>
+                            <input type="range" id="footerHeightInput" min="100" max="700" step="10" value="430">
                         </div>
-                        <input type="range" id="blendUpInput" min="20" max="500" step="5" value="150">
+
+                        <div>
+                            <div class="flex justify-between text-[11px] font-medium text-slate-400 mb-1">
+                                <span>Kepekatan / Opasitas Merah</span>
+                                <span id="footerOpacityVal" class="text-slate-200 font-bold">90%</span>
+                            </div>
+                            <input type="range" id="footerOpacityInput" min="0" max="100" step="5" value="90">
+                        </div>
                     </div>
 
-                    <!-- Perluas Ke Bawah -->
-                    <div>
-                        <div class="flex justify-between text-[11px] font-medium text-slate-400 mb-1">
-                            <span>Perluas Ke Bawah (Jangkauan Bawah)</span>
-                            <span id="blendDownVal" class="text-red-400 font-bold">200 px</span>
-                        </div>
-                        <input type="range" id="blendDownInput" min="20" max="500" step="5" value="200">
-                    </div>
                 </div>
 
                 <button type="button" onclick="resetBlendSettings()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl border border-slate-700 transition-colors">
-                    Reset Gradasi Default
+                    Reset Semua Gradasi Default
                 </button>
             </div>
 
@@ -298,7 +323,8 @@
         let state = {
             img1: { obj: null, originalSrc: null, scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, rotation: 0 },
             img2: { obj: null, originalSrc: null, scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, rotation: 0 },
-            blend: { center: 650, spreadUp: 150, spreadDown: 200 }, // State Gradasi Baru
+            blend: { center: 650, spreadUp: 150, spreadDown: 200 }, // Gradasi Tengah
+            footerGrad: { height: 430, opacity: 90 },             // Gradasi Merah Footer Baru
             text: { content: "", size: 48, x: 540, y: 1120, isDragging: false }
         };
 
@@ -366,7 +392,7 @@
             } else if (targetKey === 'blend') {
                 sectionBlend.classList.remove('hidden');
                 tabBlend.className = "py-2 rounded-lg transition-all text-center bg-red-600 text-white shadow font-semibold truncate";
-                badgeText.innerText = "Edit Gradasi Pembatas";
+                badgeText.innerText = "Pengatur Gradasi";
 
             } else if (targetKey === 'text') {
                 sectionText.classList.remove('hidden');
@@ -380,6 +406,8 @@
             state.blend.center = 650;
             state.blend.spreadUp = 150;
             state.blend.spreadDown = 200;
+            state.footerGrad.height = 430;
+            state.footerGrad.opacity = 90;
 
             document.getElementById('blendCenterInput').value = 650;
             document.getElementById('blendCenterVal').innerText = "650 px";
@@ -387,6 +415,11 @@
             document.getElementById('blendUpVal').innerText = "150 px";
             document.getElementById('blendDownInput').value = 200;
             document.getElementById('blendDownVal').innerText = "200 px";
+
+            document.getElementById('footerHeightInput').value = 430;
+            document.getElementById('footerHeightVal').innerText = "430 px";
+            document.getElementById('footerOpacityInput').value = 90;
+            document.getElementById('footerOpacityVal').innerText = "90%";
 
             drawCanvas();
         }
@@ -480,7 +513,7 @@
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, width, height);
 
-            // Perhitungan Batas Gradasi Dinamis
+            // Perhitungan Batas Gradasi Pembatas Tengah
             const topBound = Math.max(0, state.blend.center - state.blend.spreadUp);
             const bottomBound = Math.min(height, state.blend.center + state.blend.spreadDown);
 
@@ -489,7 +522,6 @@
             if (state.img2.obj) {
                 drawScaledImage(offCtx2, state.img2, 0, topBound, width, height - topBound);
 
-                // Gradasi Masking Foto 2: Transparan dari topBound ke Utuh di bottomBound
                 const fadeGradient2 = offCtx2.createLinearGradient(0, topBound, 0, bottomBound);
                 fadeGradient2.addColorStop(0, 'rgba(0,0,0,0)');
                 fadeGradient2.addColorStop(1, 'rgba(0,0,0,1)');
@@ -514,7 +546,6 @@
                 offCtx1.fillRect(0, 0, width, bottomBound);
             }
 
-            // Gradasi Masking Foto 1: Utuh di topBound ke Transparan di bottomBound
             const fadeGradient1 = offCtx1.createLinearGradient(0, topBound, 0, bottomBound);
             fadeGradient1.addColorStop(0, 'rgba(0,0,0,1)');
             fadeGradient1.addColorStop(1, 'rgba(0,0,0,0)');
@@ -539,14 +570,18 @@
                 ctx.drawImage(assets.logoRight, width - 50 - w, 50, w, 100);
             }
 
-            // ================= 4. OVERLAY FOOTER MAROON GRADIENT =================
-            const footerY_Pos = height - 280;
-            const maroonGrad = ctx.createLinearGradient(0, footerY_Pos - 150, 0, height);
+            // ================= 4. OVERLAY FOOTER MAROON GRADIENT (DISESUAIKAN KONTROL) =================
+            const fHeight = state.footerGrad.height;
+            const fOpacity = state.footerGrad.opacity / 100;
+            const footerStartY = height - fHeight;
+
+            const maroonGrad = ctx.createLinearGradient(0, footerStartY, 0, height);
             maroonGrad.addColorStop(0, 'rgba(127, 29, 29, 0)');
-            maroonGrad.addColorStop(0.7, 'rgba(127, 29, 29, 0.9)');
-            maroonGrad.addColorStop(1, 'rgba(127, 29, 29, 1)');
+            maroonGrad.addColorStop(0.6, `rgba(127, 29, 29, ${fOpacity * 0.85})`);
+            maroonGrad.addColorStop(1, `rgba(127, 29, 29, ${fOpacity})`);
+
             ctx.fillStyle = maroonGrad;
-            ctx.fillRect(0, footerY_Pos - 150, width, height - (footerY_Pos - 150));
+            ctx.fillRect(0, footerStartY, width, fHeight);
 
             // ================= 5. TEKS BERITA =================
             if (state.text.content.trim() !== "") {
@@ -611,7 +646,7 @@
             else alert("Silakan unggah gambar terlebih dahulu.");
         }
 
-        // Event Listeners Gradasi Slider
+        // Event Listeners Gradasi Pembatas Tengah
         document.getElementById('blendCenterInput').addEventListener('input', (e) => {
             state.blend.center = parseInt(e.target.value);
             document.getElementById('blendCenterVal').innerText = e.target.value + ' px';
@@ -627,6 +662,19 @@
         document.getElementById('blendDownInput').addEventListener('input', (e) => {
             state.blend.spreadDown = parseInt(e.target.value);
             document.getElementById('blendDownVal').innerText = e.target.value + ' px';
+            drawCanvas();
+        });
+
+        // Event Listeners Gradasi Merah Footer
+        document.getElementById('footerHeightInput').addEventListener('input', (e) => {
+            state.footerGrad.height = parseInt(e.target.value);
+            document.getElementById('footerHeightVal').innerText = e.target.value + ' px';
+            drawCanvas();
+        });
+
+        document.getElementById('footerOpacityInput').addEventListener('input', (e) => {
+            state.footerGrad.opacity = parseInt(e.target.value);
+            document.getElementById('footerOpacityVal').innerText = e.target.value + '%';
             drawCanvas();
         });
 
