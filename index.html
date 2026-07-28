@@ -643,10 +643,8 @@
 
             if (cropper) cropper.destroy();
 
-            const aspectRatio = key === 'img1' ? (1080 / 850) : (1080 / 900);
-
             cropper = new Cropper(targetImg, {
-                aspectRatio: aspectRatio,
+                aspectRatio: NaN, // Bebas ditarik ke segala arah (Skala Bebas)
                 viewMode: 1,
                 autoCropArea: 0.9,
                 responsive: true,
