@@ -4,22 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplikasi Bingkai KPU Karimun</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Cropper.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+    
     <style>
         body {
-            background-color: #f8fafc;
+            background-color: #f1f5f9;
             font-family: 'Montserrat', sans-serif;
         }
         .canvas-container {
             max-width: 100%;
             overflow: hidden;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            border-radius: 1.25rem;
             background-color: white;
             cursor: crosshair;
             position: sticky;
             top: 2rem;
+            border: 4px solid white;
         }
         .canvas-container.dragging {
             cursor: grabbing;
@@ -30,160 +36,333 @@
             display: block;
             touch-action: none;
         }
+        
+        /* Desain Custom Range Slider Modern */
         input[type=range] {
             -webkit-appearance: none;
             width: 100%;
             height: 6px;
             background: #e2e8f0;
-            border-radius: 5px;
+            border-radius: 999px;
             outline: none;
+            transition: all 0.3s ease;
+        }
+        input[type=range]:hover {
+            background: #cbd5e1;
         }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 18px;
-            width: 18px;
+            height: 20px;
+            width: 20px;
             border-radius: 50%;
-            background: #b91c1c;
+            background: #ffffff;
             cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            border: 3px solid #3b82f6;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.1s ease;
         }
-        .nav-btn {
-            @apply bg-white border border-gray-200 p-2 rounded-lg hover:bg-gray-50 active:scale-95 transition-all text-gray-700 flex items-center justify-center shadow-sm;
-            width: 42px;
-            height: 42px;
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
         }
+        input[type=range]::-webkit-slider-thumb:active {
+            transform: scale(0.95);
+        }
+        .range-red::-webkit-slider-thumb { border-color: #dc2626 !important; }
+        .range-gray::-webkit-slider-thumb { border-color: #4b5563 !important; }
+
+        /* Kartu Panel & Tombol D-Pad */
         .control-card {
-            @apply bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-4;
+            transition: all 0.3s ease;
         }
-        .filter-label {
-            @apply flex justify-between items-center mb-1;
+        .control-card:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
         }
-        .filter-title {
-            @apply text-[10px] font-bold text-gray-400 uppercase tracking-tight;
+        .d-pad-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            aspect-ratio: 1;
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            color: #475569;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
-        .filter-val {
-            @apply text-[10px] font-mono font-bold text-gray-600;
+        .d-pad-btn:hover {
+            background-color: #f8fafc;
+            color: #0f172a;
+            border-color: #cbd5e1;
+        }
+        .d-pad-btn:active {
+            transform: scale(0.9);
+            background-color: #e2e8f0;
         }
     </style>
 </head>
 <body class="min-h-screen pb-12">
 
-    <header class="bg-white border-b mb-8 py-4 px-6 shadow-sm">
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 mb-8 py-5 px-6 shadow-sm sticky top-0 z-40 backdrop-blur-md bg-white/90">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
-                <div class="bg-red-700 p-2 rounded-lg">
+                <div class="bg-gradient-to-br from-red-600 to-red-800 p-2.5 rounded-xl shadow-lg shadow-red-200">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 </div>
-                <h1 class="text-xl font-bold text-gray-800 tracking-tight">KPU Karimun Frame Generator</h1>
+                <h1 class="text-xl md:text-2xl font-bold text-gray-800 tracking-tight">Frame Generator <span class="text-red-700">KPU</span></h1>
             </div>
-            <p class="text-xs text-gray-500 font-medium bg-gray-100 px-3 py-1 rounded-full italic">Geser teks langsung pada gambar untuk mengatur posisi.</p>
+            <div class="flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full border border-blue-100 shadow-inner">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
+                <p class="text-xs font-semibold">Tarik teks di gambar untuk memindahkan</p>
+            </div>
         </div>
     </header>
 
     <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        <!-- Panel Kontrol Kiri -->
-        <div class="lg:col-span-4 order-2 lg:order-1">
+        <!-- ================= PANEL KIRI (KONTROL) ================= -->
+        <div class="lg:col-span-5 order-2 lg:order-1 space-y-6">
             
-            <!-- Judul Narasi -->
-            <div class="control-card border-l-4 border-l-blue-600">
-                <label class="block text-xs font-bold text-blue-600 uppercase tracking-widest mb-3">Narasi / Judul Berita</label>
-                <textarea id="inputJudul" rows="3" placeholder="Contoh: SOSIALISASI TAHAPAN PEMILIHAN SERENTAK 2024" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none text-sm mb-4 transition-all"></textarea>
+            <!-- 1. Panel Narasi / Judul -->
+            <div class="control-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-l-blue-500">
+                <div class="flex items-center gap-2 mb-4">
+                    <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    <h2 class="text-sm font-bold text-gray-700 uppercase tracking-widest">Teks Berita</h2>
+                </div>
                 
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-semibold text-gray-500">Ukuran Huruf</span>
-                        <span id="fontSizeVal" class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">48px</span>
+                <textarea id="inputJudul" rows="3" placeholder="Ketik narasi atau judul kegiatan di sini..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white outline-none text-sm text-gray-700 transition-all shadow-inner mb-4"></textarea>
+                
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-semibold text-gray-600 flex items-center gap-1">
+                            Ukuran Teks
+                        </span>
+                        <span id="fontSizeVal" class="text-xs font-bold text-blue-600 bg-blue-100 px-2.5 py-1 rounded-md">48px</span>
                     </div>
-                    <input type="range" id="fontSizeInput" min="20" max="140" value="48">
+                    <input type="range" id="fontSizeInput" min="20" max="140" value="48" class="mt-2">
                 </div>
             </div>
 
-            <!-- Foto 1 -->
-            <div class="control-card border-l-4 border-l-red-600">
-                <label class="block text-xs font-bold text-red-600 uppercase tracking-widest mb-3">Foto Utama (Atas)</label>
-                <input type="file" id="inputFoto1" class="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 mb-4 cursor-pointer" accept="image/*" />
-                
-                <div id="ctrl1" class="hidden space-y-4 pt-2 border-t border-gray-50">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-1">
-                            <div class="filter-label"><span class="filter-title">Kecerahan</span> <span id="brightVal1" class="filter-val">100%</span></div>
-                            <input type="range" id="brightInput1" min="0" max="200" value="100">
-                        </div>
-                        <div class="space-y-1">
-                            <div class="filter-label"><span class="filter-title">Kontras</span> <span id="contrastVal1" class="filter-val">100%</span></div>
-                            <input type="range" id="contrastInput1" min="0" max="200" value="100">
-                        </div>
-                    </div>
+            <!-- 2. Panel Foto 1 (Atas) -->
+            <div class="control-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-l-red-500">
+                <div class="flex items-center gap-2 mb-4">
+                    <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <h2 class="text-sm font-bold text-gray-700 uppercase tracking-widest">Foto Utama (Atas)</h2>
+                </div>
 
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-semibold text-gray-500">Skala Gambar</span>
-                        <span id="scaleVal1" class="text-xs font-bold text-red-600">100%</span>
-                    </div>
-                    <input type="range" id="scaleInput1" min="0.1" max="3" step="0.01" value="1">
+                <!-- Custom Upload Button -->
+                <label for="inputFoto1" class="flex flex-col items-center justify-center w-full px-4 py-6 border-2 border-dashed border-red-300 rounded-xl cursor-pointer bg-red-50 hover:bg-red-100 transition-all group mb-4">
+                    <svg class="w-8 h-8 text-red-400 group-hover:text-red-600 mb-2 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    <span class="text-sm font-semibold text-red-700 group-hover:text-red-900">Pilih / Ganti Foto Utama</span>
+                    <input type="file" id="inputFoto1" class="hidden" accept="image/*" />
+                </label>
+                
+                <div id="ctrl1" class="space-y-5">
                     
-                    <div class="flex flex-col items-center gap-2">
-                        <button class="nav-btn" onclick="move('img1', 0, -20)">▲</button>
-                        <div class="flex gap-2">
-                            <button class="nav-btn" onclick="move('img1', -20, 0)">◀</button>
-                            <button class="nav-btn bg-red-50 text-red-700 border-red-100 font-bold" onclick="resetPos('img1')">↺</button>
-                            <button class="nav-btn" onclick="move('img1', 20, 0)">▶</button>
+                    <!-- Tombol CROP -->
+                    <button type="button" onclick="recrop('img1')" class="w-full py-3 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl text-sm font-bold flex items-center justify-center gap-2 border border-red-200 shadow-sm transition-all active:scale-95 group">
+                        <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 0L4 4m5.121 5.121l7 7"></path></svg>
+                        Potong (Crop) Bagian Gambar
+                    </button>
+
+                    <!-- Grup Slider (Termasuk Rotasi) -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-4">
+                        <!-- Rotasi -->
+                        <div class="border-b border-slate-200 pb-4 mb-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-semibold text-gray-600 flex items-center gap-1">
+                                    <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Putar (Rotasi)
+                                </span>
+                                <div class="flex gap-1 items-center">
+                                    <button type="button" onclick="quickRotate('img1', -90)" class="px-2 py-0.5 bg-white border border-slate-200 text-xs font-bold rounded shadow-sm hover:bg-slate-100" title="Putar Kiri">-90°</button>
+                                    <button type="button" onclick="quickRotate('img1', 90)" class="px-2 py-0.5 bg-white border border-slate-200 text-xs font-bold rounded shadow-sm hover:bg-slate-100" title="Putar Kanan">+90°</button>
+                                    <span id="rotateVal1" class="text-xs font-bold text-slate-700 w-10 text-right">0°</span>
+                                </div>
+                            </div>
+                            <input type="range" id="rotateInput1" class="range-red" min="-180" max="180" value="0">
                         </div>
-                        <button class="nav-btn" onclick="move('img1', 0, 20)">▼</button>
+
+                        <!-- Zoom -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-semibold text-gray-600 flex items-center gap-1">Ukuran / Zoom</span>
+                                <span id="scaleVal1" class="text-xs font-bold text-slate-700">100%</span>
+                            </div>
+                            <input type="range" id="scaleInput1" class="range-red" min="0.1" max="3" step="0.01" value="1">
+                        </div>
+                        
+                        <!-- Kecerahan & Kontras -->
+                        <div class="grid grid-cols-2 gap-4 pt-2">
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[11px] font-semibold text-gray-600">Kecerahan</span>
+                                    <span id="brightVal1" class="text-[11px] font-bold text-slate-700">100%</span>
+                                </div>
+                                <input type="range" id="brightInput1" class="range-red" min="0" max="200" value="100">
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[11px] font-semibold text-gray-600">Kontras</span>
+                                    <span id="contrastVal1" class="text-[11px] font-bold text-slate-700">100%</span>
+                                </div>
+                                <input type="range" id="contrastInput1" class="range-red" min="0" max="200" value="100">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Joystick Posisi -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <span class="text-xs font-semibold text-gray-600 block text-center mb-3">Geser Posisi Gambar</span>
+                        <div class="grid grid-cols-3 gap-2 max-w-[150px] mx-auto">
+                            <div></div>
+                            <button type="button" class="d-pad-btn" onclick="move('img1', 0, -20)">▲</button>
+                            <div></div>
+                            <button type="button" class="d-pad-btn" onclick="move('img1', -20, 0)">◀</button>
+                            <button type="button" class="d-pad-btn !bg-red-100 !text-red-700 font-bold !border-red-200" onclick="resetPos('img1')" title="Reset Posisi & Efek">↺</button>
+                            <button type="button" class="d-pad-btn" onclick="move('img1', 20, 0)">▶</button>
+                            <div></div>
+                            <button type="button" class="d-pad-btn" onclick="move('img1', 0, 20)">▼</button>
+                            <div></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Foto 2 -->
-            <div class="control-card border-l-4 border-l-gray-400">
-                <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-3">Foto Pendukung (Bawah)</label>
-                <input type="file" id="inputFoto2" class="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 mb-4 cursor-pointer" accept="image/*" />
+            <!-- 3. Panel Foto 2 (Bawah) -->
+            <div class="control-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-l-gray-600">
+                <div class="flex items-center gap-2 mb-4">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <h2 class="text-sm font-bold text-gray-700 uppercase tracking-widest">Foto Latar (Bawah)</h2>
+                </div>
+
+                <label for="inputFoto2" class="flex flex-col items-center justify-center w-full px-4 py-6 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all group mb-4">
+                    <svg class="w-8 h-8 text-gray-400 group-hover:text-gray-600 mb-2 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    <span class="text-sm font-semibold text-gray-600 group-hover:text-gray-800">Pilih / Ganti Foto Latar</span>
+                    <input type="file" id="inputFoto2" class="hidden" accept="image/*" />
+                </label>
                 
-                <div id="ctrl2" class="hidden space-y-4 pt-2 border-t border-gray-50">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-1">
-                            <div class="filter-label"><span class="filter-title">Kecerahan</span> <span id="brightVal2" class="filter-val">100%</span></div>
-                            <input type="range" id="brightInput2" min="0" max="200" value="100">
+                <div id="ctrl2" class="space-y-5">
+                    
+                    <!-- Tombol CROP -->
+                    <button type="button" onclick="recrop('img2')" class="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-sm font-bold flex items-center justify-center gap-2 border border-gray-300 shadow-sm transition-all active:scale-95 group">
+                        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 0L4 4m5.121 5.121l7 7"></path></svg>
+                        Potong (Crop) Bagian Gambar
+                    </button>
+
+                    <!-- Grup Slider -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-4">
+                        
+                        <!-- Rotasi -->
+                        <div class="border-b border-slate-200 pb-4 mb-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-semibold text-gray-600 flex items-center gap-1">Putar (Rotasi)</span>
+                                <div class="flex gap-1 items-center">
+                                    <button type="button" onclick="quickRotate('img2', -90)" class="px-2 py-0.5 bg-white border border-slate-200 text-xs font-bold rounded shadow-sm hover:bg-slate-100" title="Putar Kiri">-90°</button>
+                                    <button type="button" onclick="quickRotate('img2', 90)" class="px-2 py-0.5 bg-white border border-slate-200 text-xs font-bold rounded shadow-sm hover:bg-slate-100" title="Putar Kanan">+90°</button>
+                                    <span id="rotateVal2" class="text-xs font-bold text-slate-700 w-10 text-right">0°</span>
+                                </div>
+                            </div>
+                            <input type="range" id="rotateInput2" class="range-gray" min="-180" max="180" value="0">
                         </div>
-                        <div class="space-y-1">
-                            <div class="filter-label"><span class="filter-title">Kontras</span> <span id="contrastVal2" class="filter-val">100%</span></div>
-                            <input type="range" id="contrastInput2" min="0" max="200" value="100">
+
+                        <!-- Zoom -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-semibold text-gray-600 flex items-center gap-1">Ukuran / Zoom</span>
+                                <span id="scaleVal2" class="text-xs font-bold text-slate-700">100%</span>
+                            </div>
+                            <input type="range" id="scaleInput2" class="range-gray" min="0.1" max="3" step="0.01" value="1">
+                        </div>
+
+                        <!-- Kecerahan & Kontras -->
+                        <div class="grid grid-cols-2 gap-4 pt-2">
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[11px] font-semibold text-gray-600">Kecerahan</span>
+                                    <span id="brightVal2" class="text-[11px] font-bold text-slate-700">100%</span>
+                                </div>
+                                <input type="range" id="brightInput2" class="range-gray" min="0" max="200" value="100">
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[11px] font-semibold text-gray-600">Kontras</span>
+                                    <span id="contrastVal2" class="text-[11px] font-bold text-slate-700">100%</span>
+                                </div>
+                                <input type="range" id="contrastInput2" class="range-gray" min="0" max="200" value="100">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-semibold text-gray-500">Skala Gambar</span>
-                        <span id="scaleVal2" class="text-xs font-bold text-gray-600">100%</span>
-                    </div>
-                    <input type="range" id="scaleInput2" min="0.1" max="3" step="0.01" value="1">
-                    
-                    <div class="flex flex-col items-center gap-2">
-                        <button class="nav-btn" onclick="move('img2', 0, -20)">▲</button>
-                        <div class="flex gap-2">
-                            <button class="nav-btn" onclick="move('img2', -20, 0)">◀</button>
-                            <button class="nav-btn bg-gray-100 text-gray-700 border-gray-200 font-bold" onclick="resetPos('img2')">↺</button>
-                            <button class="nav-btn" onclick="move('img2', 20, 0)">▶</button>
+                    <!-- Joystick Posisi -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <span class="text-xs font-semibold text-gray-600 block text-center mb-3">Geser Posisi Gambar</span>
+                        <div class="grid grid-cols-3 gap-2 max-w-[150px] mx-auto">
+                            <div></div>
+                            <button type="button" class="d-pad-btn" onclick="move('img2', 0, -20)">▲</button>
+                            <div></div>
+                            <button type="button" class="d-pad-btn" onclick="move('img2', -20, 0)">◀</button>
+                            <button type="button" class="d-pad-btn !bg-gray-200 !text-gray-800 font-bold !border-gray-300" onclick="resetPos('img2')" title="Reset Posisi">↺</button>
+                            <button type="button" class="d-pad-btn" onclick="move('img2', 20, 0)">▶</button>
+                            <div></div>
+                            <button type="button" class="d-pad-btn" onclick="move('img2', 0, 20)">▼</button>
+                            <div></div>
                         </div>
-                        <button class="nav-btn" onclick="move('img2', 0, 20)">▼</button>
                     </div>
                 </div>
             </div>
 
-            <button id="btnDownload" class="w-full bg-red-700 hover:bg-red-800 text-white font-bold py-4 px-6 rounded-2xl shadow-lg shadow-red-200 transition-all flex justify-center items-center gap-3 active:scale-[0.98]">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                Download Hasil (JPG)
+            <!-- Tombol Download -->
+            <button id="btnDownload" type="button" class="w-full bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white font-bold py-5 px-6 rounded-2xl shadow-xl shadow-red-600/30 transition-all hover:-translate-y-1 flex justify-center items-center gap-3 active:scale-[0.98] border border-red-500 mb-10">
+                <svg class="w-6 h-6 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                <span class="text-lg">Download Hasil (JPG)</span>
             </button>
         </div>
 
-        <!-- Panel Preview Kanan -->
-        <div class="lg:col-span-8 order-1 lg:order-2">
-            <div id="canvasWrapper" class="canvas-container">
+        <!-- ================= PANEL KANAN (PREVIEW KANVAS) ================= -->
+        <div class="lg:col-span-7 order-1 lg:order-2 mb-10">
+            <div id="canvasWrapper" class="canvas-container relative group">
                 <canvas id="mainCanvas" width="1080" height="1350"></canvas>
+                <!-- Indikator Resolusi -->
+                <div class="absolute top-4 right-4 bg-black/60 backdrop-blur-sm text-white text-[10px] px-3 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                    HD 1080x1350 (4:5)
+                </div>
             </div>
-            <p class="text-center text-gray-400 text-xs mt-4">Resolusi Output: 1080 x 1350 pixel (Portrait 4:5)</p>
         </div>
     </div>
+
+    <!-- ================= MODAL POPUP CROPPER ================= -->
+    <div id="cropModal" class="fixed inset-0 bg-slate-900/90 z-50 hidden flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl flex flex-col max-h-[95vh] border border-slate-200">
+            <div class="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 0L4 4m5.121 5.121l7 7"></path></svg>
+                    Potong (Crop) Gambar
+                </h3>
+                <button type="button" onclick="closeCropModal()" class="w-8 h-8 flex items-center justify-center bg-slate-100 hover:bg-red-100 hover:text-red-600 text-slate-500 rounded-full transition-colors font-bold">&times;</button>
+            </div>
+            
+            <div class="my-5 overflow-hidden relative flex-1 min-h-[400px] bg-slate-900 rounded-2xl flex items-center justify-center shadow-inner">
+                <img id="cropTargetImage" class="max-w-full max-h-full block">
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
+                <div class="flex gap-2 bg-slate-100 p-1 rounded-xl">
+                    <button type="button" onclick="cropper && cropper.rotate(-90)" class="px-4 py-2 bg-white hover:bg-slate-50 rounded-lg text-xs font-bold text-slate-700 shadow-sm transition-all border border-slate-200">↺ -90°</button>
+                    <button type="button" onclick="cropper && cropper.rotate(90)" class="px-4 py-2 bg-white hover:bg-slate-50 rounded-lg text-xs font-bold text-slate-700 shadow-sm transition-all border border-slate-200">↻ +90°</button>
+                </div>
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeCropModal()" class="px-6 py-3 bg-white border-2 border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-sm font-bold transition-all">Batal</button>
+                    <button type="button" onclick="applyCrop()" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-red-200">Terapkan Potongan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pustaka Cropper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
 
     <script>
         const canvas = document.getElementById('mainCanvas');
@@ -191,10 +370,16 @@
         const width = canvas.width;
         const height = canvas.height;
 
-        // State Global
+        // Offscreen canvas untuk optimasi render
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = width;
+        offCanvas.height = 850;
+        const offCtx = offCanvas.getContext('2d');
+
+        // State Global (Ditambah Properti Rotation)
         let state = {
-            img1: { obj: null, scale: 1, x: 0, y: 0, brightness: 100, contrast: 100 },
-            img2: { obj: null, scale: 1, x: 0, y: 0, brightness: 100, contrast: 100 },
+            img1: { obj: null, originalSrc: null, scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, rotation: 0 },
+            img2: { obj: null, originalSrc: null, scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, rotation: 0 },
             text: {
                 content: "",
                 size: 48,
@@ -204,13 +389,16 @@
             }
         };
 
+        let cropper = null;
+        let activeCropKey = null;
+
         const assets = {
             logoLeft: new Image(),
             logoRight: new Image(),
             footerImg: new Image()
         };
 
-        assets.logoLeft.crossOrigin = assets.logoRight.crossOrigin = assets.footerImg.crossOrigin = "anonymous";
+        Object.values(assets).forEach(img => img.crossOrigin = "anonymous");
         assets.logoLeft.src = "https://lh3.googleusercontent.com/d/1qVYHJ4A3pXNIGZLaPZzG0ikWBKfHm7pd";
         assets.logoRight.src = "https://lh3.googleusercontent.com/d/1DhoTVTYCArCUfzlahBvlCknRFfVHSAK9";
         assets.footerImg.src = "https://lh3.googleusercontent.com/d/1HR8E-bbfk5UuMr-FpZlDKhRxk0VChDH8";
@@ -220,7 +408,7 @@
         Object.values(assets).forEach(img => {
             img.onload = () => {
                 assetsLoaded++;
-                if(assetsLoaded === totalAssets) drawCanvas();
+                if (assetsLoaded === totalAssets) drawCanvas();
             };
         });
 
@@ -252,7 +440,7 @@
             if (isInside) {
                 state.text.isDragging = true;
                 wrapper.classList.add('dragging');
-                if(e.type === 'touchstart') e.preventDefault();
+                if (e.type === 'touchstart') e.preventDefault();
             }
         };
 
@@ -262,7 +450,7 @@
                 state.text.x = pos.x;
                 state.text.y = pos.y;
                 drawCanvas();
-                if(e.type === 'touchmove') e.preventDefault();
+                if (e.type === 'touchmove') e.preventDefault();
             }
         };
 
@@ -274,14 +462,29 @@
         canvas.addEventListener('mousedown', startDragging);
         window.addEventListener('mousemove', onMove);
         window.addEventListener('mouseup', stopDragging);
-
-        canvas.addEventListener('touchstart', startDragging, {passive: false});
-        canvas.addEventListener('touchmove', onMove, {passive: false});
+        canvas.addEventListener('touchstart', startDragging, { passive: false });
+        canvas.addEventListener('touchmove', onMove, { passive: false });
         canvas.addEventListener('touchend', stopDragging);
 
         function move(imgKey, dx, dy) {
             state[imgKey].x += dx;
             state[imgKey].y += dy;
+            drawCanvas();
+        }
+
+        function quickRotate(key, deg) {
+            let currentRot = parseInt(state[key].rotation) || 0;
+            let newRot = currentRot + deg;
+            
+            // Limit putaran agar tetap di dalam jangkauan -180 s/d 180
+            if (newRot > 180) newRot -= 360;
+            if (newRot < -180) newRot += 360;
+            
+            state[key].rotation = newRot;
+            
+            const pfx = key === 'img1' ? '1' : '2';
+            document.getElementById('rotateInput' + pfx).value = newRot;
+            document.getElementById('rotateVal' + pfx).innerText = newRot + '°';
             drawCanvas();
         }
 
@@ -291,7 +494,8 @@
             state[imgKey].scale = 1;
             state[imgKey].brightness = 100;
             state[imgKey].contrast = 100;
-            
+            state[imgKey].rotation = 0; // Reset Rotasi
+
             const pfx = imgKey === 'img1' ? '1' : '2';
             document.getElementById('scaleInput' + pfx).value = 1;
             document.getElementById('scaleVal' + pfx).innerText = '100%';
@@ -299,7 +503,9 @@
             document.getElementById('brightVal' + pfx).innerText = '100%';
             document.getElementById('contrastInput' + pfx).value = 100;
             document.getElementById('contrastVal' + pfx).innerText = '100%';
-            
+            document.getElementById('rotateInput' + pfx).value = 0;
+            document.getElementById('rotateVal' + pfx).innerText = '0°';
+
             drawCanvas();
         }
 
@@ -307,83 +513,87 @@
             if (!imgData.obj) return;
             const img = imgData.obj;
             const scale = imgData.scale;
-            
+
             let iw = img.width, ih = img.height;
             let scaleCover = Math.max(w / iw, h / ih);
-            
+
             let drawW = iw * scaleCover * scale;
             let drawH = ih * scaleCover * scale;
-            
-            let drawX = x + (w - drawW) * 0.5 + imgData.x;
-            let drawY = y + (h - drawH) * 0.5 + imgData.y;
-            
+
+            // Cari Titik Tengah untuk Sumbu Rotasi & Pergeseran Posisi
+            let centerX = x + (w / 2) + imgData.x;
+            let centerY = y + (h / 2) + imgData.y;
+
             targetCtx.save();
-            targetCtx.beginPath(); 
-            targetCtx.rect(x, y, w, h); 
+            targetCtx.beginPath();
+            targetCtx.rect(x, y, w, h);
             targetCtx.clip();
-            
-            // Terapkan Filter Kecerahan dan Kontras khusus untuk layer ini
+
             targetCtx.filter = `brightness(${imgData.brightness}%) contrast(${imgData.contrast}%)`;
             
-            targetCtx.drawImage(img, drawX, drawY, drawW, drawH);
+            // Pindahkan Origin ke Titik Tengah Area Canvas yang Dituju
+            targetCtx.translate(centerX, centerY);
+            targetCtx.rotate(imgData.rotation * Math.PI / 180);
+
+            // Karena titik origin ada di tengah, gambar dirender mundur setengah ukuran
+            targetCtx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
             targetCtx.restore();
-            
-            // Reset filter untuk gambar berikutnya agar tidak bocor ke asset frame
+
             targetCtx.filter = 'none';
         }
 
         function drawCanvas() {
             ctx.clearRect(0, 0, width, height);
             ctx.fillStyle = "#ffffff";
-            ctx.fillRect(0,0,width,height);
-            
-            // 1. Gambar Bawah (Latar Belakang)
+            ctx.fillRect(0, 0, width, height);
+
+            // 1. Latar
             if (state.img2.obj) {
                 drawScaledImage(ctx, state.img2, 0, 450, width, height - 450);
             } else {
-                ctx.fillStyle = '#f1f5f9'; 
+                ctx.fillStyle = '#f1f5f9';
                 ctx.fillRect(0, 450, width, height - 450);
             }
 
-            // 2. Gambar Atas (Dengan Efek Fade)
-            const offCanvas = document.createElement('canvas');
-            offCanvas.width = width; 
-            offCanvas.height = 850;
-            const offCtx = offCanvas.getContext('2d');
-            
+            // 2. Atas
+            offCtx.clearRect(0, 0, width, 850);
             if (state.img1.obj) {
                 drawScaledImage(offCtx, state.img1, 0, 0, width, 850);
             } else {
-                offCtx.fillStyle = '#e2e8f0'; 
+                offCtx.fillStyle = '#e2e8f0';
                 offCtx.fillRect(0, 0, width, 850);
             }
-            
+
             const fadeGradient = offCtx.createLinearGradient(0, 500, 0, 850);
             fadeGradient.addColorStop(0, 'rgba(0,0,0,1)');
             fadeGradient.addColorStop(1, 'rgba(0,0,0,0)');
-            
+
             offCtx.globalCompositeOperation = 'destination-in';
             offCtx.fillStyle = fadeGradient;
             offCtx.fillRect(0, 0, width, 850);
+            offCtx.globalCompositeOperation = 'source-over';
+
             ctx.drawImage(offCanvas, 0, 0);
 
-            // 3. Overlay Header
+            // Header Overlay
             const hGrad = ctx.createLinearGradient(0, 0, 0, 200);
             hGrad.addColorStop(0, 'rgba(0,0,0,0.6)');
             hGrad.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = hGrad; 
+            ctx.fillStyle = hGrad;
             ctx.fillRect(0, 0, width, 200);
 
             if (assets.logoLeft.complete) {
-                const h = 100; const w = h * (assets.logoLeft.width / assets.logoLeft.height);
+                const h = 100;
+                const w = h * (assets.logoLeft.width / assets.logoLeft.height);
                 ctx.drawImage(assets.logoLeft, 50, 50, w, h);
             }
             if (assets.logoRight.complete) {
-                const h = 100; const w = h * (assets.logoRight.width / assets.logoRight.height);
+                const h = 100;
+                const w = h * (assets.logoRight.width / assets.logoRight.height);
                 ctx.drawImage(assets.logoRight, width - 50 - w, 50, w, h);
             }
 
-            // 4. Gradasi Footer
+            // Footer Overlay
             const footerY_Pos = height - 280;
             const maroonGrad = ctx.createLinearGradient(0, footerY_Pos - 150, 0, height);
             maroonGrad.addColorStop(0, 'rgba(127, 29, 29, 0)');
@@ -392,14 +602,14 @@
             ctx.fillStyle = maroonGrad;
             ctx.fillRect(0, footerY_Pos - 150, width, height - (footerY_Pos - 150));
 
-            // 5. Render Judul/Narasi
+            // Teks
             if (state.text.content.trim() !== "") {
                 ctx.save();
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillStyle = '#ffffff';
-                ctx.font = `bold ${state.text.size}px "Montserrat"`;
-                
+                ctx.font = `bold ${state.text.size}px "Montserrat", sans-serif`;
+
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
                 ctx.shadowBlur = 15;
                 ctx.shadowOffsetX = 4;
@@ -407,14 +617,14 @@
 
                 const lines = state.text.content.split('\n');
                 const lineHeight = state.text.size * 1.3;
-                
+
                 lines.forEach((line, i) => {
                     ctx.fillText(line.toUpperCase(), state.text.x, state.text.y + (i * lineHeight));
                 });
                 ctx.restore();
             }
 
-            // 6. Gambar Footer Asset
+            // Footer IMG
             if (assets.footerImg.complete && assets.footerImg.width > 0) {
                 const fW = width;
                 const fH = fW * (assets.footerImg.height / assets.footerImg.width);
@@ -422,6 +632,82 @@
             }
         }
 
+        /* ----- CROPPER CONTROLS ----- */
+        function openCropModal(imageSrc, key) {
+            activeCropKey = key;
+            const modal = document.getElementById('cropModal');
+            const targetImg = document.getElementById('cropTargetImage');
+
+            targetImg.src = imageSrc;
+            modal.classList.remove('hidden');
+
+            if (cropper) cropper.destroy();
+
+            const aspectRatio = key === 'img1' ? (1080 / 850) : (1080 / 900);
+
+            cropper = new Cropper(targetImg, {
+                aspectRatio: aspectRatio,
+                viewMode: 1,
+                autoCropArea: 0.9,
+                responsive: true,
+                restore: false
+            });
+        }
+
+        function closeCropModal() {
+            document.getElementById('cropModal').classList.add('hidden');
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+        }
+
+        function applyCrop() {
+            if (!cropper || !activeCropKey) return;
+
+            const croppedCanvas = cropper.getCroppedCanvas({
+                maxWidth: 2000,
+                maxHeight: 2000
+            });
+
+            const croppedDataUrl = croppedCanvas.toDataURL('image/jpeg', 0.9);
+
+            const img = new Image();
+            img.onload = () => {
+                state[activeCropKey].obj = img;
+                resetPos(activeCropKey);
+                closeCropModal();
+            };
+            img.src = croppedDataUrl;
+        }
+
+        function recrop(key) {
+            if (state[key].originalSrc) {
+                openCropModal(state[key].originalSrc, key);
+            } else {
+                alert("Silakan pilih file foto terlebih dahulu dengan mengklik area bergaris putus-putus di atas.");
+            }
+        }
+
+        function setupUpload(inputId, stateKey) {
+            document.getElementById(inputId).addEventListener('change', function (e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (f) => {
+                        state[stateKey].originalSrc = f.target.result;
+                        openCropModal(f.target.result, stateKey);
+                        e.target.value = ''; 
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        setupUpload('inputFoto1', 'img1');
+        setupUpload('inputFoto2', 'img2');
+
+        /* ----- EVENT LISTENERS ----- */
         document.getElementById('inputJudul').addEventListener('input', (e) => {
             state.text.content = e.target.value;
             drawCanvas();
@@ -433,83 +719,54 @@
             drawCanvas();
         });
 
-        function setupUpload(inputId, stateKey, ctrlId) {
-            document.getElementById(inputId).addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if(file) {
-                    const reader = new FileReader();
-                    reader.onload = (f) => {
-                        const img = new Image();
-                        img.onload = () => {
-                            state[stateKey].obj = img;
-                            state[stateKey].x = 0;
-                            state[stateKey].y = 0;
-                            document.getElementById(ctrlId).classList.remove('hidden');
-                            drawCanvas();
-                        };
-                        img.src = f.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                }
+        // Event Input Panel 1 & 2
+        ['1', '2'].forEach(id => {
+            // Event Rotasi
+            document.getElementById(`rotateInput${id}`).addEventListener('input', (e) => {
+                state[`img${id}`].rotation = parseInt(e.target.value);
+                document.getElementById(`rotateVal${id}`).innerText = e.target.value + '°';
+                drawCanvas();
             });
-        }
-
-        setupUpload('inputFoto1', 'img1', 'ctrl1');
-        setupUpload('inputFoto2', 'img2', 'ctrl2');
-
-        // Filter Foto 1
-        document.getElementById('scaleInput1').addEventListener('input', (e) => {
-            state.img1.scale = parseFloat(e.target.value);
-            document.getElementById('scaleVal1').innerText = Math.round(state.img1.scale * 100) + '%';
-            drawCanvas();
-        });
-        document.getElementById('brightInput1').addEventListener('input', (e) => {
-            state.img1.brightness = e.target.value;
-            document.getElementById('brightVal1').innerText = e.target.value + '%';
-            drawCanvas();
-        });
-        document.getElementById('contrastInput1').addEventListener('input', (e) => {
-            state.img1.contrast = e.target.value;
-            document.getElementById('contrastVal1').innerText = e.target.value + '%';
-            drawCanvas();
-        });
-
-        // Filter Foto 2
-        document.getElementById('scaleInput2').addEventListener('input', (e) => {
-            state.img2.scale = parseFloat(e.target.value);
-            document.getElementById('scaleVal2').innerText = Math.round(state.img2.scale * 100) + '%';
-            drawCanvas();
-        });
-        document.getElementById('brightInput2').addEventListener('input', (e) => {
-            state.img2.brightness = e.target.value;
-            document.getElementById('brightVal2').innerText = e.target.value + '%';
-            drawCanvas();
-        });
-        document.getElementById('contrastInput2').addEventListener('input', (e) => {
-            state.img2.contrast = e.target.value;
-            document.getElementById('contrastVal2').innerText = e.target.value + '%';
-            drawCanvas();
+            // Event Zoom
+            document.getElementById(`scaleInput${id}`).addEventListener('input', (e) => {
+                state[`img${id}`].scale = parseFloat(e.target.value);
+                document.getElementById(`scaleVal${id}`).innerText = Math.round(e.target.value * 100) + '%';
+                drawCanvas();
+            });
+            // Event Brightness
+            document.getElementById(`brightInput${id}`).addEventListener('input', (e) => {
+                state[`img${id}`].brightness = e.target.value;
+                document.getElementById(`brightVal${id}`).innerText = e.target.value + '%';
+                drawCanvas();
+            });
+            // Event Contrast
+            document.getElementById(`contrastInput${id}`).addEventListener('input', (e) => {
+                state[`img${id}`].contrast = e.target.value;
+                document.getElementById(`contrastVal${id}`).innerText = e.target.value + '%';
+                drawCanvas();
+            });
         });
 
         document.getElementById('btnDownload').addEventListener('click', () => {
             const btn = document.getElementById('btnDownload');
             const originalContent = btn.innerHTML;
-            btn.innerHTML = "Sedang Memproses...";
+            btn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses...`;
             btn.disabled = true;
 
             setTimeout(() => {
                 try {
                     const link = document.createElement('a');
                     link.download = 'KPU_Karimun_' + Date.now() + '.jpg';
-                    link.href = canvas.toDataURL('image/jpeg', 0.92);
+                    link.href = canvas.toDataURL('image/jpeg', 0.95);
                     link.click();
                 } catch (e) {
                     console.error("Gagal mendownload:", e);
+                    alert("Gagal mengunduh gambar.");
                 } finally {
                     btn.innerHTML = originalContent;
                     btn.disabled = false;
                 }
-            }, 500);
+            }, 300);
         });
 
         window.onload = drawCanvas;
