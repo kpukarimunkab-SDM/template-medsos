@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Bingkai KPU Karimun</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .canvas-container {
+            max-width: 100%;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-radius: 1rem;
+            background-color: white;
+            cursor: crosshair;
+            position: sticky;
+            top: 2rem;
+        }
+        .canvas-container.dragging {
+            cursor: grabbing;
+        }
+        canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+            touch-action: none;
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: #b91c1c;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .nav-btn {
+            @apply bg-white border border-gray-200 p-2 rounded-lg hover:bg-gray-50 active:scale-95 transition-all text-gray-700 flex items-center justify-center shadow-sm;
+            width: 42px;
+            height: 42px;
+        }
+        .control-card {
+            @apply bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-4;
+        }
+        .filter-label {
+            @apply flex justify-between items-center mb-1;
+        }
+        .filter-title {
+            @apply text-[10px] font-bold text-gray-400 uppercase tracking-tight;
+        }
+        .filter-val {
+            @apply text-[10px] font-mono font-bold text-gray-600;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-12">
+
+    <header class="bg-white border-b mb-8 py-4 px-6 shadow-sm">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-red-700 p-2 rounded-lg">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                </div>
+                <h1 class="text-xl font-bold text-gray-800 tracking-tight">KPU Karimun Frame Generator</h1>
+            </div>
+            <p class="text-xs text-gray-500 font-medium bg-gray-100 px-3 py-1 rounded-full italic">Geser teks langsung pada gambar untuk mengatur posisi.</p>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Panel Kontrol Kiri -->
+        <div class="lg:col-span-4 order-2 lg:order-1">
+            
+            <!-- Judul Narasi -->
+            <div class="control-card border-l-4 border-l-blue-600">
+                <label class="block text-xs font-bold text-blue-600 uppercase tracking-widest mb-3">Narasi / Judul Berita</label>
+                <textarea id="inputJudul" rows="3" placeholder="Contoh: SOSIALISASI TAHAPAN PEMILIHAN SERENTAK 2024" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none text-sm mb-4 transition-all"></textarea>
+                
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-semibold text-gray-500">Ukuran Huruf</span>
+                        <span id="fontSizeVal" class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">48px</span>
+                    </div>
+                    <input type="range" id="fontSizeInput" min="20" max="140" value="48">
+                </div>
+            </div>
+
+            <!-- Foto 1 -->
+            <div class="control-card border-l-4 border-l-red-600">
+                <label class="block text-xs font-bold text-red-600 uppercase tracking-widest mb-3">Foto Utama (Atas)</label>
+                <input type="file" id="inputFoto1" class="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 mb-4 cursor-pointer" accept="image/*" />
+                
+                <div id="ctrl1" class="hidden space-y-4 pt-2 border-t border-gray-50">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <div class="filter-label"><span class="filter-title">Kecerahan</span> <span id="brightVal1" class="filter-val">100%</span></div>
+                            <input type="range" id="brightInput1" min="0" max="200" value="100">
+                        </div>
+                        <div class="space-y-1">
+                            <div class="filter-label"><span class="filter-title">Kontras</span> <span id="contrastVal1" class="filter-val">100%</span></div>
+                            <input type="range" id="contrastInput1" min="0" max="200" value="100">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-semibold text-gray-500">Skala Gambar</span>
+                        <span id="scaleVal1" class="text-xs font-bold text-red-600">100%</span>
+                    </div>
+                    <input type="range" id="scaleInput1" min="0.1" max="3" step="0.01" value="1">
+                    
+                    <div class="flex flex-col items-center gap-2">
+                        <button class="nav-btn" onclick="move('img1', 0, -20)">▲</button>
+                        <div class="flex gap-2">
+                            <button class="nav-btn" onclick="move('img1', -20, 0)">◀</button>
+                            <button class="nav-btn bg-red-50 text-red-700 border-red-100 font-bold" onclick="resetPos('img1')">↺</button>
+                            <button class="nav-btn" onclick="move('img1', 20, 0)">▶</button>
+                        </div>
+                        <button class="nav-btn" onclick="move('img1', 0, 20)">▼</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Foto 2 -->
+            <div class="control-card border-l-4 border-l-gray-400">
+                <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-3">Foto Pendukung (Bawah)</label>
+                <input type="file" id="inputFoto2" class="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 mb-4 cursor-pointer" accept="image/*" />
+                
+                <div id="ctrl2" class="hidden space-y-4 pt-2 border-t border-gray-50">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <div class="filter-label"><span class="filter-title">Kecerahan</span> <span id="brightVal2" class="filter-val">100%</span></div>
+                            <input type="range" id="brightInput2" min="0" max="200" value="100">
+                        </div>
+                        <div class="space-y-1">
+                            <div class="filter-label"><span class="filter-title">Kontras</span> <span id="contrastVal2" class="filter-val">100%</span></div>
+                            <input type="range" id="contrastInput2" min="0" max="200" value="100">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-semibold text-gray-500">Skala Gambar</span>
+                        <span id="scaleVal2" class="text-xs font-bold text-gray-600">100%</span>
+                    </div>
+                    <input type="range" id="scaleInput2" min="0.1" max="3" step="0.01" value="1">
+                    
+                    <div class="flex flex-col items-center gap-2">
+                        <button class="nav-btn" onclick="move('img2', 0, -20)">▲</button>
+                        <div class="flex gap-2">
+                            <button class="nav-btn" onclick="move('img2', -20, 0)">◀</button>
+                            <button class="nav-btn bg-gray-100 text-gray-700 border-gray-200 font-bold" onclick="resetPos('img2')">↺</button>
+                            <button class="nav-btn" onclick="move('img2', 20, 0)">▶</button>
+                        </div>
+                        <button class="nav-btn" onclick="move('img2', 0, 20)">▼</button>
+                    </div>
+                </div>
+            </div>
+
+            <button id="btnDownload" class="w-full bg-red-700 hover:bg-red-800 text-white font-bold py-4 px-6 rounded-2xl shadow-lg shadow-red-200 transition-all flex justify-center items-center gap-3 active:scale-[0.98]">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                Download Hasil (JPG)
+            </button>
+        </div>
+
+        <!-- Panel Preview Kanan -->
+        <div class="lg:col-span-8 order-1 lg:order-2">
+            <div id="canvasWrapper" class="canvas-container">
+                <canvas id="mainCanvas" width="1080" height="1350"></canvas>
+            </div>
+            <p class="text-center text-gray-400 text-xs mt-4">Resolusi Output: 1080 x 1350 pixel (Portrait 4:5)</p>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+
+        // State Global
+        let state = {
+            img1: { obj: null, scale: 1, x: 0, y: 0, brightness: 100, contrast: 100 },
+            img2: { obj: null, scale: 1, x: 0, y: 0, brightness: 100, contrast: 100 },
+            text: {
+                content: "",
+                size: 48,
+                x: 540,
+                y: 1120,
+                isDragging: false
+            }
+        };
+
+        const assets = {
+            logoLeft: new Image(),
+            logoRight: new Image(),
+            footerImg: new Image()
+        };
+
+        assets.logoLeft.crossOrigin = assets.logoRight.crossOrigin = assets.footerImg.crossOrigin = "anonymous";
+        assets.logoLeft.src = "https://lh3.googleusercontent.com/d/1qVYHJ4A3pXNIGZLaPZzG0ikWBKfHm7pd";
+        assets.logoRight.src = "https://lh3.googleusercontent.com/d/1DhoTVTYCArCUfzlahBvlCknRFfVHSAK9";
+        assets.footerImg.src = "https://lh3.googleusercontent.com/d/1HR8E-bbfk5UuMr-FpZlDKhRxk0VChDH8";
+
+        let assetsLoaded = 0;
+        const totalAssets = Object.keys(assets).length;
+        Object.values(assets).forEach(img => {
+            img.onload = () => {
+                assetsLoaded++;
+                if(assetsLoaded === totalAssets) drawCanvas();
+            };
+        });
+
+        const wrapper = document.getElementById('canvasWrapper');
+
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            let clientX, clientY;
+
+            if (e.type.includes('touch')) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            return {
+                x: (clientX - rect.left) * scaleX,
+                y: (clientY - rect.top) * scaleY
+            };
+        }
+
+        const startDragging = (e) => {
+            const pos = getMousePos(e);
+            const isInside = Math.abs(pos.x - state.text.x) < 400 && Math.abs(pos.y - state.text.y) < 200;
+            if (isInside) {
+                state.text.isDragging = true;
+                wrapper.classList.add('dragging');
+                if(e.type === 'touchstart') e.preventDefault();
+            }
+        };
+
+        const onMove = (e) => {
+            if (state.text.isDragging) {
+                const pos = getMousePos(e);
+                state.text.x = pos.x;
+                state.text.y = pos.y;
+                drawCanvas();
+                if(e.type === 'touchmove') e.preventDefault();
+            }
+        };
+
+        const stopDragging = () => {
+            state.text.isDragging = false;
+            wrapper.classList.remove('dragging');
+        };
+
+        canvas.addEventListener('mousedown', startDragging);
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', stopDragging);
+
+        canvas.addEventListener('touchstart', startDragging, {passive: false});
+        canvas.addEventListener('touchmove', onMove, {passive: false});
+        canvas.addEventListener('touchend', stopDragging);
+
+        function move(imgKey, dx, dy) {
+            state[imgKey].x += dx;
+            state[imgKey].y += dy;
+            drawCanvas();
+        }
+
+        function resetPos(imgKey) {
+            state[imgKey].x = 0;
+            state[imgKey].y = 0;
+            state[imgKey].scale = 1;
+            state[imgKey].brightness = 100;
+            state[imgKey].contrast = 100;
+            
+            const pfx = imgKey === 'img1' ? '1' : '2';
+            document.getElementById('scaleInput' + pfx).value = 1;
+            document.getElementById('scaleVal' + pfx).innerText = '100%';
+            document.getElementById('brightInput' + pfx).value = 100;
+            document.getElementById('brightVal' + pfx).innerText = '100%';
+            document.getElementById('contrastInput' + pfx).value = 100;
+            document.getElementById('contrastVal' + pfx).innerText = '100%';
+            
+            drawCanvas();
+        }
+
+        function drawScaledImage(targetCtx, imgData, x, y, w, h) {
+            if (!imgData.obj) return;
+            const img = imgData.obj;
+            const scale = imgData.scale;
+            
+            let iw = img.width, ih = img.height;
+            let scaleCover = Math.max(w / iw, h / ih);
+            
+            let drawW = iw * scaleCover * scale;
+            let drawH = ih * scaleCover * scale;
+            
+            let drawX = x + (w - drawW) * 0.5 + imgData.x;
+            let drawY = y + (h - drawH) * 0.5 + imgData.y;
+            
+            targetCtx.save();
+            targetCtx.beginPath(); 
+            targetCtx.rect(x, y, w, h); 
+            targetCtx.clip();
+            
+            // Terapkan Filter Kecerahan dan Kontras khusus untuk layer ini
+            targetCtx.filter = `brightness(${imgData.brightness}%) contrast(${imgData.contrast}%)`;
+            
+            targetCtx.drawImage(img, drawX, drawY, drawW, drawH);
+            targetCtx.restore();
+            
+            // Reset filter untuk gambar berikutnya agar tidak bocor ke asset frame
+            targetCtx.filter = 'none';
+        }
+
+        function drawCanvas() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0,0,width,height);
+            
+            // 1. Gambar Bawah (Latar Belakang)
+            if (state.img2.obj) {
+                drawScaledImage(ctx, state.img2, 0, 450, width, height - 450);
+            } else {
+                ctx.fillStyle = '#f1f5f9'; 
+                ctx.fillRect(0, 450, width, height - 450);
+            }
+
+            // 2. Gambar Atas (Dengan Efek Fade)
+            const offCanvas = document.createElement('canvas');
+            offCanvas.width = width; 
+            offCanvas.height = 850;
+            const offCtx = offCanvas.getContext('2d');
+            
+            if (state.img1.obj) {
+                drawScaledImage(offCtx, state.img1, 0, 0, width, 850);
+            } else {
+                offCtx.fillStyle = '#e2e8f0'; 
+                offCtx.fillRect(0, 0, width, 850);
+            }
+            
+            const fadeGradient = offCtx.createLinearGradient(0, 500, 0, 850);
+            fadeGradient.addColorStop(0, 'rgba(0,0,0,1)');
+            fadeGradient.addColorStop(1, 'rgba(0,0,0,0)');
+            
+            offCtx.globalCompositeOperation = 'destination-in';
+            offCtx.fillStyle = fadeGradient;
+            offCtx.fillRect(0, 0, width, 850);
+            ctx.drawImage(offCanvas, 0, 0);
+
+            // 3. Overlay Header
+            const hGrad = ctx.createLinearGradient(0, 0, 0, 200);
+            hGrad.addColorStop(0, 'rgba(0,0,0,0.6)');
+            hGrad.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = hGrad; 
+            ctx.fillRect(0, 0, width, 200);
+
+            if (assets.logoLeft.complete) {
+                const h = 100; const w = h * (assets.logoLeft.width / assets.logoLeft.height);
+                ctx.drawImage(assets.logoLeft, 50, 50, w, h);
+            }
+            if (assets.logoRight.complete) {
+                const h = 100; const w = h * (assets.logoRight.width / assets.logoRight.height);
+                ctx.drawImage(assets.logoRight, width - 50 - w, 50, w, h);
+            }
+
+            // 4. Gradasi Footer
+            const footerY_Pos = height - 280;
+            const maroonGrad = ctx.createLinearGradient(0, footerY_Pos - 150, 0, height);
+            maroonGrad.addColorStop(0, 'rgba(127, 29, 29, 0)');
+            maroonGrad.addColorStop(0.7, 'rgba(127, 29, 29, 0.9)');
+            maroonGrad.addColorStop(1, 'rgba(127, 29, 29, 1)');
+            ctx.fillStyle = maroonGrad;
+            ctx.fillRect(0, footerY_Pos - 150, width, height - (footerY_Pos - 150));
+
+            // 5. Render Judul/Narasi
+            if (state.text.content.trim() !== "") {
+                ctx.save();
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = '#ffffff';
+                ctx.font = `bold ${state.text.size}px "Montserrat"`;
+                
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+                ctx.shadowBlur = 15;
+                ctx.shadowOffsetX = 4;
+                ctx.shadowOffsetY = 4;
+
+                const lines = state.text.content.split('\n');
+                const lineHeight = state.text.size * 1.3;
+                
+                lines.forEach((line, i) => {
+                    ctx.fillText(line.toUpperCase(), state.text.x, state.text.y + (i * lineHeight));
+                });
+                ctx.restore();
+            }
+
+            // 6. Gambar Footer Asset
+            if (assets.footerImg.complete && assets.footerImg.width > 0) {
+                const fW = width;
+                const fH = fW * (assets.footerImg.height / assets.footerImg.width);
+                ctx.drawImage(assets.footerImg, 0, height - fH, fW, fH);
+            }
+        }
+
+        document.getElementById('inputJudul').addEventListener('input', (e) => {
+            state.text.content = e.target.value;
+            drawCanvas();
+        });
+
+        document.getElementById('fontSizeInput').addEventListener('input', (e) => {
+            state.text.size = parseInt(e.target.value);
+            document.getElementById('fontSizeVal').innerText = state.text.size + 'px';
+            drawCanvas();
+        });
+
+        function setupUpload(inputId, stateKey, ctrlId) {
+            document.getElementById(inputId).addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if(file) {
+                    const reader = new FileReader();
+                    reader.onload = (f) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            state[stateKey].obj = img;
+                            state[stateKey].x = 0;
+                            state[stateKey].y = 0;
+                            document.getElementById(ctrlId).classList.remove('hidden');
+                            drawCanvas();
+                        };
+                        img.src = f.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        setupUpload('inputFoto1', 'img1', 'ctrl1');
+        setupUpload('inputFoto2', 'img2', 'ctrl2');
+
+        // Filter Foto 1
+        document.getElementById('scaleInput1').addEventListener('input', (e) => {
+            state.img1.scale = parseFloat(e.target.value);
+            document.getElementById('scaleVal1').innerText = Math.round(state.img1.scale * 100) + '%';
+            drawCanvas();
+        });
+        document.getElementById('brightInput1').addEventListener('input', (e) => {
+            state.img1.brightness = e.target.value;
+            document.getElementById('brightVal1').innerText = e.target.value + '%';
+            drawCanvas();
+        });
+        document.getElementById('contrastInput1').addEventListener('input', (e) => {
+            state.img1.contrast = e.target.value;
+            document.getElementById('contrastVal1').innerText = e.target.value + '%';
+            drawCanvas();
+        });
+
+        // Filter Foto 2
+        document.getElementById('scaleInput2').addEventListener('input', (e) => {
+            state.img2.scale = parseFloat(e.target.value);
+            document.getElementById('scaleVal2').innerText = Math.round(state.img2.scale * 100) + '%';
+            drawCanvas();
+        });
+        document.getElementById('brightInput2').addEventListener('input', (e) => {
+            state.img2.brightness = e.target.value;
+            document.getElementById('brightVal2').innerText = e.target.value + '%';
+            drawCanvas();
+        });
+        document.getElementById('contrastInput2').addEventListener('input', (e) => {
+            state.img2.contrast = e.target.value;
+            document.getElementById('contrastVal2').innerText = e.target.value + '%';
+            drawCanvas();
+        });
+
+        document.getElementById('btnDownload').addEventListener('click', () => {
+            const btn = document.getElementById('btnDownload');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = "Sedang Memproses...";
+            btn.disabled = true;
+
+            setTimeout(() => {
+                try {
+                    const link = document.createElement('a');
+                    link.download = 'KPU_Karimun_' + Date.now() + '.jpg';
+                    link.href = canvas.toDataURL('image/jpeg', 0.92);
+                    link.click();
+                } catch (e) {
+                    console.error("Gagal mendownload:", e);
+                } finally {
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                }
+            }, 500);
+        });
+
+        window.onload = drawCanvas;
+    </script>
+</body>
+</html>
