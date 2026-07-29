@@ -96,7 +96,7 @@
     <!-- Main Workspace Grid -->
     <div class="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-1">
         
-        <!-- KANVAS PREVIEW (HP TAMPIL DI ATAS) -->
+        <!-- KANVAS PREVIEW -->
         <div class="lg:col-span-8 lg:order-2 flex flex-col items-center">
             <div id="canvasWrapper" class="canvas-container relative w-full max-w-[420px] lg:max-w-[540px]">
                 <canvas id="mainCanvas" width="1080" height="1350"></canvas>
@@ -110,12 +110,12 @@
             <p class="text-[11px] text-slate-500 mt-2 text-center">Petunjuk: Klik gambar atas/bawah di kanvas untuk berganti kontrol.</p>
         </div>
 
-        <!-- PANEL KONTROL TUNGGAL (MOBILE BOTTOM NAVBAR / DESKTOP SIDEBAR) -->
+        <!-- PANEL KONTROL -->
         <div id="controlPanel" class="lg:col-span-4 lg:order-1 fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 p-3.5 rounded-t-3xl shadow-[0_-10px_25px_-5px_rgba(0,0,0,0.5)] lg:relative lg:bottom-auto lg:left-auto lg:right-auto lg:z-auto lg:bg-slate-900 lg:border lg:p-4 lg:rounded-2xl lg:shadow-xl custom-scroll max-h-[58vh] lg:max-h-none overflow-y-auto space-y-3">
             
             <div class="w-12 h-1 bg-slate-700 rounded-full mx-auto mb-1 lg:hidden"></div>
 
-            <!-- NAVBAR TAB SELECTOR 4 MODUL (FOTO 1 | FOTO 2 | GRADASI | TEKS) -->
+            <!-- NAVBAR TAB SELECTOR 4 MODUL -->
             <div class="grid grid-cols-4 gap-1 bg-slate-800/90 p-1 rounded-xl text-[11px] font-semibold sticky top-0 z-10">
                 <button type="button" id="tabImg1" onclick="selectActiveTarget('img1')" class="py-2 rounded-lg transition-all text-center bg-red-600 text-white shadow truncate">
                     Foto 1
@@ -197,17 +197,17 @@
                 </div>
             </div>
 
-            <!-- SECTION B: KONTROL GRADASI (PEMBATAS TENGAH & FOOTER MERAH) -->
+            <!-- SECTION B: KONTROL GRADASI (PEMBATAS TENGAH, PUTIH TENGAH & FOOTER MERAH) -->
             <div id="sectionBlendControls" class="space-y-3 hidden">
                 <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-800 space-y-3">
                     
-                    <!-- Sub-Grup 1: Gradasi Pembatas Tengah -->
+                    <!-- Sub-Grup 1: Transisi Pembatas Foto -->
                     <div class="border-b border-slate-700/60 pb-3 space-y-2.5">
-                        <span class="text-[11px] font-bold text-red-400 uppercase tracking-wider block">1. Pembatas Tengah (Foto 1 & 2)</span>
+                        <span class="text-[11px] font-bold text-red-400 uppercase tracking-wider block">1. Transisi Foto 1 & 2</span>
                         
                         <div>
                             <div class="flex justify-between text-[11px] font-medium text-slate-400 mb-1">
-                                <span>Posisi Pembatas (Naik / Turun)</span>
+                                <span>Posisi Titik Temu Foto</span>
                                 <span id="blendCenterVal" class="text-slate-200 font-bold">650 px</span>
                             </div>
                             <input type="range" id="blendCenterInput" min="300" max="1000" step="5" value="650">
@@ -215,7 +215,7 @@
 
                         <div>
                             <div class="flex justify-between text-[11px] font-medium text-slate-400 mb-1">
-                                <span>Perluas Ke Atas</span>
+                                <span>Perluas Transisi Ke Atas</span>
                                 <span id="blendUpVal" class="text-slate-200 font-bold">150 px</span>
                             </div>
                             <input type="range" id="blendUpInput" min="20" max="500" step="5" value="150">
@@ -223,16 +223,47 @@
 
                         <div>
                             <div class="flex justify-between text-[11px] font-medium text-slate-400 mb-1">
-                                <span>Perluas Ke Bawah</span>
+                                <span>Perluas Transisi Ke Bawah</span>
                                 <span id="blendDownVal" class="text-slate-200 font-bold">200 px</span>
                             </div>
                             <input type="range" id="blendDownInput" min="20" max="500" step="5" value="200">
                         </div>
                     </div>
 
-                    <!-- Sub-Grup 2: Gradasi Merah Footer -->
+                    <!-- Sub-Grup 2: Gradasi Putih Tengah -->
+                    <div class="border-b border-slate-700/60 pb-3 space-y-2.5">
+                        <span class="text-[11px] font-bold text-slate-200 uppercase tracking-wider block flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-white"></span> 2. Gradasi Putih Tengah
+                        </span>
+                        
+                        <div>
+                            <div class="flex justify-between text-[11px] font-medium text-slate-400 mb-1">
+                                <span>Posisi Gradasi Putih</span>
+                                <span id="whiteCenterVal" class="text-slate-200 font-bold">650 px</span>
+                            </div>
+                            <input type="range" id="whiteCenterInput" min="300" max="1000" step="5" value="650">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-[11px] font-medium text-slate-400 mb-1">
+                                <span>Tinggi / Jangkauan Putih</span>
+                                <span id="whiteHeightVal" class="text-slate-200 font-bold">200 px</span>
+                            </div>
+                            <input type="range" id="whiteHeightInput" min="0" max="600" step="10" value="200">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-[11px] font-medium text-slate-400 mb-1">
+                                <span>Opasitas / Kepekatan Putih</span>
+                                <span id="whiteOpacityVal" class="text-slate-200 font-bold">70%</span>
+                            </div>
+                            <input type="range" id="whiteOpacityInput" min="0" max="100" step="5" value="70">
+                        </div>
+                    </div>
+
+                    <!-- Sub-Grup 3: Gradasi Merah Footer -->
                     <div class="space-y-2.5 pt-1">
-                        <span class="text-[11px] font-bold text-red-400 uppercase tracking-wider block">2. Gradasi Merah Footer (Bawah)</span>
+                        <span class="text-[11px] font-bold text-red-400 uppercase tracking-wider block">3. Gradasi Merah Footer (Bawah)</span>
                         
                         <div>
                             <div class="flex justify-between text-[11px] font-medium text-slate-400 mb-1">
@@ -323,8 +354,9 @@
         let state = {
             img1: { obj: null, originalSrc: null, scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, rotation: 0 },
             img2: { obj: null, originalSrc: null, scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, rotation: 0 },
-            blend: { center: 650, spreadUp: 150, spreadDown: 200 }, // Gradasi Tengah
-            footerGrad: { height: 430, opacity: 90 },             // Gradasi Merah Footer Baru
+            blend: { center: 650, spreadUp: 150, spreadDown: 200 }, // Transisi foto 1 & 2
+            whiteGrad: { center: 650, height: 200, opacity: 70 },   // Gradasi Putih Tengah Baru
+            footerGrad: { height: 430, opacity: 90 },              // Gradasi Merah Footer
             text: { content: "", size: 48, x: 540, y: 1120, isDragging: false }
         };
 
@@ -403,12 +435,10 @@
         }
 
         function resetBlendSettings() {
+            // Reset Transisi Foto
             state.blend.center = 650;
             state.blend.spreadUp = 150;
             state.blend.spreadDown = 200;
-            state.footerGrad.height = 430;
-            state.footerGrad.opacity = 90;
-
             document.getElementById('blendCenterInput').value = 650;
             document.getElementById('blendCenterVal').innerText = "650 px";
             document.getElementById('blendUpInput').value = 150;
@@ -416,6 +446,20 @@
             document.getElementById('blendDownInput').value = 200;
             document.getElementById('blendDownVal').innerText = "200 px";
 
+            // Reset Gradasi Putih
+            state.whiteGrad.center = 650;
+            state.whiteGrad.height = 200;
+            state.whiteGrad.opacity = 70;
+            document.getElementById('whiteCenterInput').value = 650;
+            document.getElementById('whiteCenterVal').innerText = "650 px";
+            document.getElementById('whiteHeightInput').value = 200;
+            document.getElementById('whiteHeightVal').innerText = "200 px";
+            document.getElementById('whiteOpacityInput').value = 70;
+            document.getElementById('whiteOpacityVal').innerText = "70%";
+
+            // Reset Gradasi Footer Merah
+            state.footerGrad.height = 430;
+            state.footerGrad.opacity = 90;
             document.getElementById('footerHeightInput').value = 430;
             document.getElementById('footerHeightVal').innerText = "430 px";
             document.getElementById('footerOpacityInput').value = 90;
@@ -557,7 +601,23 @@
 
             ctx.drawImage(offCanvas1, 0, 0);
 
-            // ================= 3. OVERLAY HEADER & LOGO =================
+            // ================= 3. GRADASI PUTIH TENGAH (DISESUAIKAN KONTROL) =================
+            if (state.whiteGrad.height > 0 && state.whiteGrad.opacity > 0) {
+                const wCenter = state.whiteGrad.center;
+                const wHeight = state.whiteGrad.height;
+                const wOpacity = state.whiteGrad.opacity / 100;
+                const wTop = wCenter - (wHeight / 2);
+
+                const whiteGrad = ctx.createLinearGradient(0, wTop, 0, wTop + wHeight);
+                whiteGrad.addColorStop(0, 'rgba(255, 255, 255, 0)');
+                whiteGrad.addColorStop(0.5, `rgba(255, 255, 255, ${wOpacity})`);
+                whiteGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+                ctx.fillStyle = whiteGrad;
+                ctx.fillRect(0, wTop, width, wHeight);
+            }
+
+            // ================= 4. OVERLAY HEADER & LOGO =================
             const hGrad = ctx.createLinearGradient(0, 0, 0, 200);
             hGrad.addColorStop(0, 'rgba(0,0,0,0.6)');
             hGrad.addColorStop(1, 'rgba(0,0,0,0)');
@@ -570,7 +630,7 @@
                 ctx.drawImage(assets.logoRight, width - 50 - w, 50, w, 100);
             }
 
-            // ================= 4. OVERLAY FOOTER MAROON GRADIENT (DISESUAIKAN KONTROL) =================
+            // ================= 5. OVERLAY FOOTER MAROON GRADIENT =================
             const fHeight = state.footerGrad.height;
             const fOpacity = state.footerGrad.opacity / 100;
             const footerStartY = height - fHeight;
@@ -583,7 +643,7 @@
             ctx.fillStyle = maroonGrad;
             ctx.fillRect(0, footerStartY, width, fHeight);
 
-            // ================= 5. TEKS BERITA =================
+            // ================= 6. TEKS BERITA =================
             if (state.text.content.trim() !== "") {
                 ctx.save();
                 ctx.textAlign = 'center';
@@ -604,7 +664,7 @@
                 ctx.restore();
             }
 
-            // ================= 6. FOOTER FRAME BORDER =================
+            // ================= 7. FOOTER FRAME BORDER =================
             if (assets.footerImg.complete && assets.footerImg.width > 0) {
                 const fW = width;
                 const fH = fW * (assets.footerImg.height / assets.footerImg.width);
@@ -646,7 +706,7 @@
             else alert("Silakan unggah gambar terlebih dahulu.");
         }
 
-        // Event Listeners Gradasi Pembatas Tengah
+        // Event Listeners Transisi Foto 1 & 2
         document.getElementById('blendCenterInput').addEventListener('input', (e) => {
             state.blend.center = parseInt(e.target.value);
             document.getElementById('blendCenterVal').innerText = e.target.value + ' px';
@@ -662,6 +722,25 @@
         document.getElementById('blendDownInput').addEventListener('input', (e) => {
             state.blend.spreadDown = parseInt(e.target.value);
             document.getElementById('blendDownVal').innerText = e.target.value + ' px';
+            drawCanvas();
+        });
+
+        // Event Listeners Gradasi Putih Tengah
+        document.getElementById('whiteCenterInput').addEventListener('input', (e) => {
+            state.whiteGrad.center = parseInt(e.target.value);
+            document.getElementById('whiteCenterVal').innerText = e.target.value + ' px';
+            drawCanvas();
+        });
+
+        document.getElementById('whiteHeightInput').addEventListener('input', (e) => {
+            state.whiteGrad.height = parseInt(e.target.value);
+            document.getElementById('whiteHeightVal').innerText = e.target.value + ' px';
+            drawCanvas();
+        });
+
+        document.getElementById('whiteOpacityInput').addEventListener('input', (e) => {
+            state.whiteGrad.opacity = parseInt(e.target.value);
+            document.getElementById('whiteOpacityVal').innerText = e.target.value + '%';
             drawCanvas();
         });
 
