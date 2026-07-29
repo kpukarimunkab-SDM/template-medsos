@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingkai KPU - Full Custom Gradient Control</title>
+    <title>Bingkai KPU - Full Custom Gradient & Text Alignment Control</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -107,7 +107,7 @@
                     <span id="statusBadgeText">Foto Utama Terpilih</span>
                 </div>
             </div>
-            <p class="text-[11px] text-slate-500 mt-2 text-center">Petunjuk: Klik gambar atas/bawah di kanvas untuk berganti kontrol.</p>
+            <p class="text-[11px] text-slate-500 mt-2 text-center">Petunjuk: Klik foto/teks di kanvas untuk berganti mode kontrol.</p>
         </div>
 
         <!-- PANEL KONTROL -->
@@ -197,11 +197,11 @@
                 </div>
             </div>
 
-            <!-- SECTION B: KONTROL GRADASI (PEMBATAS TENGAH, PUTIH TENGAH & FOOTER MERAH) -->
+            <!-- SECTION B: KONTROL GRADASI -->
             <div id="sectionBlendControls" class="space-y-3 hidden">
                 <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-800 space-y-3">
                     
-                    <!-- Sub-Grup 1: Transisi Pembatas Foto -->
+                    <!-- Sub-Grup 1: Transisi Foto -->
                     <div class="border-b border-slate-700/60 pb-3 space-y-2.5">
                         <span class="text-[11px] font-bold text-red-400 uppercase tracking-wider block">1. Transisi Foto 1 & 2</span>
                         
@@ -289,21 +289,79 @@
                 </button>
             </div>
 
-            <!-- SECTION C: KONTROL TEKS -->
+            <!-- SECTION C: KONTROL TEKS LENGKAP WITH ALIGNMENT & RULER -->
             <div id="sectionTextControls" class="space-y-3 hidden">
                 <div class="space-y-1">
                     <label class="text-xs font-medium text-slate-400">Narasi Berita</label>
                     <textarea id="inputJudul" rows="3" placeholder="Ketik narasi di sini..." class="w-full p-2.5 bg-slate-800 border border-slate-700 rounded-xl focus:outline-none focus:border-red-500 text-xs text-slate-100 placeholder-slate-500"></textarea>
                 </div>
 
-                <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-800">
-                    <div class="flex justify-between text-[11px] font-medium text-slate-400 mb-1">
-                        <span>Ukuran Teks</span>
-                        <span id="fontSizeVal" class="text-red-400 font-bold">48px</span>
+                <!-- 1. PERATAAN TEKS (ALIGNMENT) -->
+                <div>
+                    <label class="text-xs font-medium text-slate-400 mb-1 block">Perataan Teks (Alignment)</label>
+                    <div class="grid grid-cols-4 gap-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700/60">
+                        <button type="button" id="btnAlignLeft" onclick="setTextAlign('left')" class="py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all flex flex-col items-center gap-0.5">
+                            <span>Left</span>
+                            <span class="text-[9px] opacity-75">Rata Kiri</span>
+                        </button>
+                        <button type="button" id="btnAlignCenter" onclick="setTextAlign('center')" class="py-1.5 rounded-lg text-xs font-semibold bg-red-600 text-white shadow transition-all flex flex-col items-center gap-0.5">
+                            <span>Center</span>
+                            <span class="text-[9px] opacity-75">Tengah</span>
+                        </button>
+                        <button type="button" id="btnAlignRight" onclick="setTextAlign('right')" class="py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all flex flex-col items-center gap-0.5">
+                            <span>Right</span>
+                            <span class="text-[9px] opacity-75">Rata Kanan</span>
+                        </button>
+                        <button type="button" id="btnAlignJustify" onclick="setTextAlign('justify')" class="py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all flex flex-col items-center gap-0.5">
+                            <span>Justify</span>
+                            <span class="text-[9px] opacity-75">Kiri-Kanan</span>
+                        </button>
                     </div>
-                    <input type="range" id="fontSizeInput" min="20" max="120" value="48">
                 </div>
-                <p class="text-[10px] text-slate-500 italic">* Teks bisa langsung digeser dengan jari pada kanvas.</p>
+
+                <!-- 2. SLIDER UKURAN & LEBAR AREA TEKS -->
+                <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-800 space-y-2.5">
+                    <div>
+                        <div class="flex justify-between text-[11px] font-medium text-slate-400 mb-1">
+                            <span>Ukuran Teks</span>
+                            <span id="fontSizeVal" class="text-red-400 font-bold">48px</span>
+                        </div>
+                        <input type="range" id="fontSizeInput" min="20" max="120" value="48">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-[11px] font-medium text-slate-400 mb-1">
+                            <span>Lebar Area Teks (Margin Boks)</span>
+                            <span id="boxWidthVal" class="text-slate-200 font-bold">900 px</span>
+                        </div>
+                        <input type="range" id="boxWidthInput" min="400" max="1040" step="10" value="900">
+                    </div>
+                </div>
+
+                <!-- 3. RULER & PRESIcenter CONTROL -->
+                <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-800 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                            Garis Bantu / Ruler Tengah
+                        </span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleRuler" class="sr-only peer" checked onchange="toggleRuler(this.checked)">
+                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-red-600"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-700/50">
+                        <div class="text-[11px] text-slate-400">
+                            Posisi Teks: <span id="posCoords" class="text-slate-200 font-mono font-bold">X: 540 | Y: 1120</span>
+                        </div>
+                        <button type="button" onclick="snapToCenter()" class="px-2.5 py-1 bg-red-900/50 hover:bg-red-800/80 text-red-200 border border-red-700/60 rounded-lg text-[11px] font-semibold transition-all shadow flex items-center gap-1">
+                            <span>🎯 Pas Tengah (X: 540)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <p class="text-[10px] text-slate-500 italic">* Teks bisa digeser langsung dengan jari/mouse pada kanvas (akan snap otomatis ke tengah saat mendekati X=540).</p>
             </div>
 
         </div>
@@ -355,9 +413,18 @@
             img1: { obj: null, originalSrc: null, scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, rotation: 0 },
             img2: { obj: null, originalSrc: null, scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, rotation: 0 },
             blend: { center: 650, spreadUp: 150, spreadDown: 200 }, // Transisi foto 1 & 2
-            whiteGrad: { center: 650, height: 200, opacity: 70 },   // Gradasi Putih Tengah Baru
+            whiteGrad: { center: 650, height: 200, opacity: 70 },   // Gradasi Putih Tengah
             footerGrad: { height: 430, opacity: 90 },              // Gradasi Merah Footer
-            text: { content: "", size: 48, x: 540, y: 1120, isDragging: false }
+            text: { 
+                content: "", 
+                size: 48, 
+                x: 540, 
+                y: 1120, 
+                align: 'center',    // 'left', 'center', 'right', 'justify'
+                boxWidth: 900,      // Lebar area pengerjaan teks (px)
+                showRuler: true,    // Garis Bantu / Ruler
+                isDragging: false 
+            }
         };
 
         let cropper = null;
@@ -434,8 +501,42 @@
             drawCanvas();
         }
 
+        // Teks Alignment Switcher
+        function setTextAlign(alignMode) {
+            state.text.align = alignMode;
+            const btnL = document.getElementById('btnAlignLeft');
+            const btnC = document.getElementById('btnAlignCenter');
+            const btnR = document.getElementById('btnAlignRight');
+            const btnJ = document.getElementById('btnAlignJustify');
+
+            [btnL, btnC, btnR, btnJ].forEach(btn => {
+                btn.className = "py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all flex flex-col items-center gap-0.5";
+            });
+
+            if (alignMode === 'left') btnL.className = "py-1.5 rounded-lg text-xs font-semibold bg-red-600 text-white shadow transition-all flex flex-col items-center gap-0.5";
+            if (alignMode === 'center') btnC.className = "py-1.5 rounded-lg text-xs font-semibold bg-red-600 text-white shadow transition-all flex flex-col items-center gap-0.5";
+            if (alignMode === 'right') btnR.className = "py-1.5 rounded-lg text-xs font-semibold bg-red-600 text-white shadow transition-all flex flex-col items-center gap-0.5";
+            if (alignMode === 'justify') btnJ.className = "py-1.5 rounded-lg text-xs font-semibold bg-red-600 text-white shadow transition-all flex flex-col items-center gap-0.5";
+
+            drawCanvas();
+        }
+
+        function toggleRuler(enabled) {
+            state.text.showRuler = enabled;
+            drawCanvas();
+        }
+
+        function snapToCenter() {
+            state.text.x = 540;
+            updatePosCoordsDisplay();
+            drawCanvas();
+        }
+
+        function updatePosCoordsDisplay() {
+            document.getElementById('posCoords').innerText = `X: ${Math.round(state.text.x)} | Y: ${Math.round(state.text.y)}`;
+        }
+
         function resetBlendSettings() {
-            // Reset Transisi Foto
             state.blend.center = 650;
             state.blend.spreadUp = 150;
             state.blend.spreadDown = 200;
@@ -446,7 +547,6 @@
             document.getElementById('blendDownInput').value = 200;
             document.getElementById('blendDownVal').innerText = "200 px";
 
-            // Reset Gradasi Putih
             state.whiteGrad.center = 650;
             state.whiteGrad.height = 200;
             state.whiteGrad.opacity = 70;
@@ -457,7 +557,6 @@
             document.getElementById('whiteOpacityInput').value = 70;
             document.getElementById('whiteOpacityVal').innerText = "70%";
 
-            // Reset Gradasi Footer Merah
             state.footerGrad.height = 430;
             state.footerGrad.opacity = 90;
             document.getElementById('footerHeightInput').value = 430;
@@ -484,7 +583,7 @@
         const handleStart = (e) => {
             const pos = getMousePos(e);
             
-            const isInsideText = Math.abs(pos.x - state.text.x) < 350 && Math.abs(pos.y - state.text.y) < 150;
+            const isInsideText = Math.abs(pos.x - state.text.x) < (state.text.boxWidth / 2) && Math.abs(pos.y - state.text.y) < 180;
             if (isInsideText) {
                 state.text.isDragging = true;
                 selectActiveTarget('text');
@@ -504,16 +603,24 @@
         const handleMove = (e) => {
             if (state.text.isDragging) {
                 const pos = getMousePos(e);
-                state.text.x = pos.x;
+                
+                // Smart Snap to Center (x = 540) saat mendekati batas 15px
+                if (Math.abs(pos.x - 540) < 15) {
+                    state.text.x = 540;
+                } else {
+                    state.text.x = pos.x;
+                }
+                
                 state.text.y = pos.y;
+                updatePosCoordsDisplay();
                 drawCanvas();
             }
         };
 
         window.addEventListener('mousemove', handleMove);
         window.addEventListener('touchmove', handleMove, { passive: true });
-        window.addEventListener('mouseup', () => state.text.isDragging = false);
-        window.addEventListener('touchend', () => state.text.isDragging = false);
+        window.addEventListener('mouseup', () => { if (state.text.isDragging) { state.text.isDragging = false; drawCanvas(); } });
+        window.addEventListener('touchend', () => { if (state.text.isDragging) { state.text.isDragging = false; drawCanvas(); } });
 
         function move(key, dx, dy) {
             state[key].x += dx;
@@ -552,16 +659,50 @@
             targetCtx.filter = 'none';
         }
 
+        // Algoritma Justify (Rata Kiri-Kanan) Teks Kanvas
+        function drawJustifiedLine(targetCtx, text, startX, lineY, targetWidth) {
+            const words = text.trim().split(' ');
+            if (words.length <= 1) {
+                targetCtx.textAlign = 'left';
+                targetCtx.fillText(text, startX, lineY);
+                return;
+            }
+
+            let totalWordsWidth = 0;
+            const wordWidths = words.map(w => {
+                const wWidth = targetCtx.measureText(w).width;
+                totalWordsWidth += wWidth;
+                return wWidth;
+            });
+
+            const spaceCount = words.length - 1;
+            const calculatedSpace = (targetWidth - totalWordsWidth) / spaceCount;
+            const defaultSpace = targetCtx.measureText(' ').width;
+
+            // Jika spasi terlalu rapat atau terlalu ekstrim, gunakan standar left align
+            if (calculatedSpace < defaultSpace * 0.4) {
+                targetCtx.textAlign = 'left';
+                targetCtx.fillText(text, startX, lineY);
+                return;
+            }
+
+            let currentX = startX;
+            targetCtx.textAlign = 'left';
+            for (let i = 0; i < words.length; i++) {
+                targetCtx.fillText(words[i], currentX, lineY);
+                currentX += wordWidths[i] + calculatedSpace;
+            }
+        }
+
         function drawCanvas() {
             ctx.clearRect(0, 0, width, height);
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, width, height);
 
-            // Perhitungan Batas Gradasi Pembatas Tengah
             const topBound = Math.max(0, state.blend.center - state.blend.spreadUp);
             const bottomBound = Math.min(height, state.blend.center + state.blend.spreadDown);
 
-            // ================= 1. GAMBAR LATAR (FOTO 2 / BAGIAN BAWAH) =================
+            // ================= 1. GAMBAR LATAR (FOTO 2) =================
             offCtx2.clearRect(0, 0, width, height);
             if (state.img2.obj) {
                 drawScaledImage(offCtx2, state.img2, 0, topBound, width, height - topBound);
@@ -581,7 +722,7 @@
                 ctx.fillRect(0, topBound, width, height - topBound);
             }
 
-            // ================= 2. GAMBAR UTAMA (FOTO 1 / BAGIAN ATAS) =================
+            // ================= 2. GAMBAR UTAMA (FOTO 1) =================
             offCtx1.clearRect(0, 0, width, height);
             if (state.img1.obj) {
                 drawScaledImage(offCtx1, state.img1, 0, 0, width, bottomBound);
@@ -601,7 +742,7 @@
 
             ctx.drawImage(offCanvas1, 0, 0);
 
-            // ================= 3. GRADASI PUTIH TENGAH (DISESUAIKAN KONTROL) =================
+            // ================= 3. GRADASI PUTIH TENGAH =================
             if (state.whiteGrad.height > 0 && state.whiteGrad.opacity > 0) {
                 const wCenter = state.whiteGrad.center;
                 const wHeight = state.whiteGrad.height;
@@ -643,23 +784,44 @@
             ctx.fillStyle = maroonGrad;
             ctx.fillRect(0, footerStartY, width, fHeight);
 
-            // ================= 6. TEKS BERITA =================
+            // ================= 6. RENDERING TEKS BERITA =================
             if (state.text.content.trim() !== "") {
                 ctx.save();
-                ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillStyle = '#ffffff';
                 ctx.font = `bold ${state.text.size}px "Montserrat", sans-serif`;
 
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-                ctx.shadowBlur = 15;
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+                ctx.shadowBlur = 16;
                 ctx.shadowOffsetX = 3;
                 ctx.shadowOffsetY = 3;
 
                 const lines = state.text.content.split('\n');
                 const lineHeight = state.text.size * 1.3;
+                const totalHeight = lines.length * lineHeight;
+                const startY = state.text.y - (totalHeight / 2) + (lineHeight / 2);
+
+                const boxW = state.text.boxWidth;
+                const leftX = state.text.x - (boxW / 2);
+                const rightX = state.text.x + (boxW / 2);
+
                 lines.forEach((line, i) => {
-                    ctx.fillText(line.toUpperCase(), state.text.x, state.text.y + (i * lineHeight));
+                    const currentLineY = startY + (i * lineHeight);
+                    const upperText = line.toUpperCase();
+
+                    if (state.text.align === 'left') {
+                        ctx.textAlign = 'left';
+                        ctx.fillText(upperText, leftX, currentLineY);
+                    } else if (state.text.align === 'right') {
+                        ctx.textAlign = 'right';
+                        ctx.fillText(upperText, rightX, currentLineY);
+                    } else if (state.text.align === 'justify') {
+                        drawJustifiedLine(ctx, upperText, leftX, currentLineY, boxW);
+                    } else {
+                        // Default Center
+                        ctx.textAlign = 'center';
+                        ctx.fillText(upperText, state.text.x, currentLineY);
+                    }
                 });
                 ctx.restore();
             }
@@ -669,6 +831,54 @@
                 const fW = width;
                 const fH = fW * (assets.footerImg.height / assets.footerImg.width);
                 ctx.drawImage(assets.footerImg, 0, height - fH, fW, fH);
+            }
+
+            // ================= 8. GARIS BANTU / RULER PRESIcenter =================
+            if (state.text.showRuler || state.text.isDragging) {
+                ctx.save();
+                
+                const isExactCenter = Math.abs(state.text.x - 540) < 2;
+
+                // A. Garis Vertikal Tengah Kanvas (X = 540)
+                ctx.beginPath();
+                ctx.setLineDash([8, 6]);
+                ctx.lineWidth = isExactCenter ? 3 : 1.5;
+                ctx.strokeStyle = isExactCenter ? '#22c55e' : '#ef4444'; 
+                ctx.moveTo(540, 0);
+                ctx.lineTo(540, height);
+                ctx.stroke();
+
+                // B. Garis Horizontal Posisi Teks (Y = state.text.y)
+                ctx.beginPath();
+                ctx.setLineDash([4, 4]);
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+                ctx.moveTo(0, state.text.y);
+                ctx.lineTo(width, state.text.y);
+                ctx.stroke();
+
+                // C. Bounding Box Lebar Area Teks
+                const boxW = state.text.boxWidth;
+                const leftX = state.text.x - (boxW / 2);
+                ctx.beginPath();
+                ctx.setLineDash([3, 3]);
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = isExactCenter ? 'rgba(34, 197, 94, 0.7)' : 'rgba(239, 68, 68, 0.7)';
+                ctx.rect(leftX, state.text.y - 45, boxW, 90);
+                ctx.stroke();
+
+                // D. Badge Penunjuk Posisi di Atas Teks
+                const badgeText = isExactCenter ? "🎯 PAS TENGAH (X: 540)" : `X: ${Math.round(state.text.x)} | Y: ${Math.round(state.text.y)}`;
+                ctx.fillStyle = isExactCenter ? 'rgba(34, 197, 94, 0.95)' : 'rgba(15, 23, 42, 0.9)';
+                ctx.fillRect(state.text.x - 130, state.text.y - 85, 260, 28);
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 12px "Montserrat", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(badgeText, state.text.x, state.text.y - 71);
+
+                ctx.restore();
             }
         }
 
@@ -782,6 +992,12 @@
             drawCanvas();
         });
 
+        document.getElementById('boxWidthInput').addEventListener('input', (e) => {
+            state.text.boxWidth = parseInt(e.target.value);
+            document.getElementById('boxWidthVal').innerText = e.target.value + ' px';
+            drawCanvas();
+        });
+
         document.getElementById('rotateInput').addEventListener('input', (e) => {
             state[activeImgKey].rotation = parseInt(e.target.value);
             document.getElementById('rotateVal').innerText = e.target.value + '°';
@@ -807,10 +1023,19 @@
         });
 
         document.getElementById('btnDownload').addEventListener('click', () => {
+            // Sembunyikan garis bantu sebelum mengunduh hasil gambar
+            const tempRulerState = state.text.showRuler;
+            state.text.showRuler = false;
+            drawCanvas();
+
             const link = document.createElement('a');
             link.download = 'Frame_KPU_' + Date.now() + '.jpg';
             link.href = canvas.toDataURL('image/jpeg', 0.95);
             link.click();
+
+            // Kembalikan status ruler semula
+            state.text.showRuler = tempRulerState;
+            drawCanvas();
         });
 
         window.onload = drawCanvas;
